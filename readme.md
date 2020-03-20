@@ -10,7 +10,7 @@ npm install
 This installs node_modules and all necessary dependencies.
 
 Now you have to get an authentiacation key from dialogflow so that you can access dialogflow.
-When you have retrived a client access token, you have to point to that token as an environment variable. Note that you have to use **GOOGLE_APPLICATION_CREDENTIALS** as the variable name.
+When you have retrived a client access token, you have to point to the client access token as an environment variable. Note that you have to use **GOOGLE_APPLICATION_CREDENTIALS** as the variable name.
 On Windows powershell:
 ```
 $env:GOOGLE_APPLICATION_CREDENTIALS="<Path to client access token>"
