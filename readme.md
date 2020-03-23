@@ -35,6 +35,7 @@ REST is working
 ```
 
 **Using pm2**
+
 If you want to use this on a server, you probably want the API to run at startup automatically if you have to restart the server or if anything would happen to it. This is where pm2 is great to use, because it does exactly that.
 
 to start the project with pm2 simply use:
