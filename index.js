@@ -8,6 +8,9 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 
 async function dflowProccessing(message, projectId = 'hilda-lpjuyr') {
