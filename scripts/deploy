@@ -1,0 +1,7 @@
+#!/bin/
+
+cd ~/cruzrDialogflowREST
+git pull
+npm install
+npm test
+exit
