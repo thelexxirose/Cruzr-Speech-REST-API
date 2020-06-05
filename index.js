@@ -99,9 +99,9 @@ class Server {
 
         app.post('/upload_file',this.uploadDisk.any(), (req, res) => {
             console.log('file disk uploaded');
-            console.log('File: ' + req.file.originalname);
+            console.log('filename: ' + req.files[0].originalname);
             //res.send('file disk upload success');
-            let query = req.file.originalname;
+            let query = req.files[0].originalname;
             this.stt.stt(query, 'LINEAR16')
             .then((text) => {
                 this.nlp.resolveQuery(text, (msg) => {

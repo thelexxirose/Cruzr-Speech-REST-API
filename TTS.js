@@ -8,8 +8,8 @@ module.exports = class TTS {
         this.util = require('util');
         // Creates a client
         this.client = new this.textToSpeech.TextToSpeechClient({
-            projectId: 'hilda-270710',
-            keyFilename: '../hilda-gcloud-credentials.json'
+            projectId: 'delta-exchange-279407',
+            keyFilename: '../MyFirstProject.json'
         });
         this.language = language;
     }

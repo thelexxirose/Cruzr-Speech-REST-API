@@ -6,8 +6,8 @@ module.exports = class STT {
       this.Mp32Wav = require('mp3-to-wav');
       // Creates a client
       this.client = new this.speechToText.SpeechClient({
-        projectId: 'hilda-270710',
-        keyFilename: '../hilda-gcloud-credentials.json'
+        projectId: 'delta-exchange-279407',
+        keyFilename: '../MyFirstProject.json'
       });
       //
       this.language = language;

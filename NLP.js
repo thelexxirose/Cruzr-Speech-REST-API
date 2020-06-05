@@ -10,7 +10,7 @@ module.exports = class NLP {
     
         const sessionClient = new this.dialogflow.SessionsClient({
             projectId: projectId,
-            keyFilename: '../hilda-dialogflow-credentials.json'
+            keyFilename: '../dialogflow_hilda.json'
         });
         const sessionPath = sessionClient.sessionPath(projectId, sessionId);
     
