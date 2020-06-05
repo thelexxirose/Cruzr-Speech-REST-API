@@ -1,2 +1,5 @@
 node_modules
 .env
+cruzr-gateway-sha256*
+audio/*
+outputAudio/*
