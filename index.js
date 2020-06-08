@@ -118,10 +118,10 @@ class Server {
         //Send in a file, then convert file to text, send through dialogflow, then return an answer while creating an answer sound file that is stored on the server
         app.post('/upload_file',this.uploadDisk.any(), (req, res) => {
             console.log('file disk uploaded');
-            console.log('File: ' + req.file.originalname);
+            console.log('filename: ' + req.files[0].originalname);
             //res.send('file disk upload success');
             //Get the original name of the file that was sent
-            let query = req.file.originalname;
+            let query = req.files[0].originalname;
             //Convert audio file to text
             this.stt.stt(query, 'LINEAR16')
             .then((text) => {
