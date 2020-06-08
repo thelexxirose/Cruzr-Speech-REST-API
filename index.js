@@ -13,7 +13,8 @@ const NLP = require('./NLP');
 const STT = require('./STT');
 const TTS = require('./TTS');
 
-//Comment for testing the develop branch
+//Make ProjectVariables available for usage
+const PV = require('./ProjectVariables')
 
 class Server {
     constructor() {
@@ -188,13 +189,15 @@ class Server {
 
     //Create new instances of the language classes
     initClasses() {
-        let language = 'en-US'
+        //Project Variables
+        this.pv = new PV('hilda-lpjuyr', '../hilda-dialogflow-credentials.json', 'delta-exchange-279407', 'hilda-gcloud-credentials.json')
+        let language = 'en-US';
         //Speech To Text
-        this.stt = new STT(language);
+        this.stt = new STT(language, this.pv.getGCloudProjectName(), this.pv.getGCloudCreds());
         //Text To Speech
-        this.tts = new TTS(language);
+        this.tts = new TTS(language, this.pv.getGCloudProjectName(), this.pv.getGCloudCreds());
         //Natural Language Processing
-        this.nlp = new NLP(language);
+        this.nlp = new NLP(language, this.pv.getDflowProjectName(), this.pv.getDflowCreds());
     }
 }
 

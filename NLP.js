@@ -1,24 +1,29 @@
 //Natural Language Processing module
 module.exports = class NLP {
-    constructor(language) {
+    constructor(language, projectName, credentials) {
+        
         this.language = language;
+        
+        this.projectName = projectName;
+        this.credentials = credentials;
+        
         this.dialogflow = require('dialogflow');
         this.uuid = require('uuid');
     }
 
     //method that sends text to dialogflow and returns a text response
-    async dflowProccessing(message, projectId = 'hilda-lpjuyr') {
+    async dflowProcessing(message) {
         //create a session ID
         const sessionId = this.uuid.v4();
     
         //Instanciate a new SessionsClient
         const sessionClient = new this.dialogflow.SessionsClient({
-            projectId: projectId,
-            keyFilename: '../dialogflow_hilda.json'
+            projectId: this.projectName,
+            keyFilename: this.credentials
         });
 
         //
-        const sessionPath = sessionClient.sessionPath(projectId, sessionId);
+        const sessionPath = sessionClient.sessionPath(this.projectName, sessionId);
     
         //Construct the request
         const request = {
@@ -50,7 +55,7 @@ module.exports = class NLP {
     
     //Method that calls dflowProcessing with a callback function
     async resolveQuery(query, _callback) {
-        let res = await this.dflowProcessing(query);
+        let res = await this.dflowProcessing(query, 'hilda-ipjuyr');
         
         _callback(res);
     }

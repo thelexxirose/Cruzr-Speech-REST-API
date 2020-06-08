@@ -1,6 +1,11 @@
 //Text To Speech module
 module.exports = class TTS {
-    constructor(language) {
+    constructor(language, projectName, credentials) {
+
+        this.language = language;
+
+        this.projectName = projectName;
+        this.credentials = credentials;
         // Imports the Google Cloud client library
         this.textToSpeech = require('@google-cloud/text-to-speech');
 
@@ -9,10 +14,9 @@ module.exports = class TTS {
         this.util = require('util');
         // Creates a client
         this.client = new this.textToSpeech.TextToSpeechClient({
-            projectId: 'delta-exchange-279407',
-            keyFilename: '../MyFirstProject.json'
+            projectId: this.projectName,
+            keyFilename: this.credentials
         });
-        this.language = language;
     }
 
     

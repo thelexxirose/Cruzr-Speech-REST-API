@@ -1,17 +1,21 @@
 //Speech To Text module
 module.exports = class STT {
-    constructor(language) {
+    constructor(language, projectName, credentials) {
+      
+      this.language = language;
+
+      this.projectName = projectName;
+      this.credentials = credentials;
+
       // Imports the Google Cloud client library
       this.speechToText = require('@google-cloud/speech');
       this.fs = require('fs');
       this.Mp32Wav = require('mp3-to-wav');
       // Creates a client
       this.client = new this.speechToText.SpeechClient({
-        projectId: 'delta-exchange-279407',
-        keyFilename: '../MyFirstProject.json'
+        projectId: this.projectName,
+        keyFilename: this.credentials
       });
-      //Define the language to be used
-      this.language = language;
     }
 
     //Supposed to convert from mp3 to wav, but it currently doesn't work
