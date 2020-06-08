@@ -5,7 +5,7 @@ module.exports = class NLP {
         this.uuid = require('uuid');
     }
 
-    async dflowProccessing(message, projectId = 'hilda-lpjuyr') {
+    async dflowProcessing(message, projectId = 'hilda-lpjuyr') {
         const sessionId = this.uuid.v4();
     
         const sessionClient = new this.dialogflow.SessionsClient({
@@ -39,7 +39,7 @@ module.exports = class NLP {
     
     // function that runs runSample
     async resolveQuery(query, _callback) {
-        let res = await this.dflowProccessing(query);
+        let res = await this.dflowProcessing(query);
         
         _callback(res);
     }

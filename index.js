@@ -93,6 +93,24 @@ class Server {
             });
         });
 
+        app.post('/dialog_v2', (req, res) => {
+            let query = req.body.text;
+            this.stt.stt(query, 'LINEAR16')
+            .then((text) => {
+                this.nlp.dflowProcessing(text)
+                .then((msg) => {
+                    let result = {
+                        fulfillmentText: msg.fulfillmentText,
+                        fields: msg.parameters.fields,
+                        intent: msg.intent.displayName
+                    }
+                    this.tts.tts(result.fulfillmentText);
+                    console.log(result);
+                    res.send(result);
+                });
+            });
+        });
+
         app.post('/test', (req, res) => {
             res.send("POST is working!")
         });
@@ -108,6 +126,29 @@ class Server {
                     let result = {
                         fulfillmentText: msg.fulfillmentText,
                         fields: msg.parameters.fields,
+                        intent: mfame
+                    }
+                    this.tts.tts(result.fulfillmentText);
+                    console.log(result);
+                    res.send(result);
+                });
+            });
+            //res.send('hello');
+        });
+
+
+        app.post('/upload_file_v2',this.uploadDisk.any(), (req, res) => {
+            console.log('file disk uploaded');
+            console.log('filename: ' + req.files[0].originalname);
+            //res.send('file disk upload success');
+            let query = req.files[0].originalname;
+            this.stt.stt(query, 'LINEAR16')
+            .then((text) => {
+                this.nlp.dflowProcessing(text)
+                .then((msg) => {
+                    let result = {
+                        fulfillmentText: msg.fulfillmentText,
+                        fields: msg.parameters.fields,
                         intent: msg.intent.displayName
                     }
                     this.tts.tts(result.fulfillmentText);
@@ -117,6 +158,8 @@ class Server {
             });
             //res.send('hello');
         });
+
+
     }
 
     initClasses() {
