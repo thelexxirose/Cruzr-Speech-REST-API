@@ -1,3 +1,4 @@
+//Speech To Text module
 module.exports = class STT {
     constructor(language) {
       // Imports the Google Cloud client library
@@ -9,15 +10,16 @@ module.exports = class STT {
         projectId: 'delta-exchange-279407',
         keyFilename: '../MyFirstProject.json'
       });
-      //
+      //Define the language to be used
       this.language = language;
     }
 
-
+    //Supposed to convert from mp3 to wav, but it currently doesn't work
     async mp3Converter(file) {
        new this.Mp32Wav('C:/Users/thele/Documents/NodeJS/Cruzr-client/audio' + file);
     }
 
+    //stt method. returns a transcription of a wav sound file
     async stt(audioFile, encoding) {
       // The name of the audio file to transcribe
       const fileName = './audio/' + audioFile;
