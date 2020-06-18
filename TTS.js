@@ -21,7 +21,7 @@ module.exports = class TTS {
 
     
     //tts method. creates an mp3 file to outputAudio directory
-    async tts(text) {
+    async tts(text, callback) {
         // Construct the request
         const request = {
             input: {text: text},
@@ -37,5 +37,7 @@ module.exports = class TTS {
         const writeFile = this.util.promisify(this.fs.writeFile);
         await writeFile('./outputAudio/output.mp3', response.audioContent, 'binary');
         console.log('Audio content written to file: output.mp3');
+
+        callback();
     }
 }

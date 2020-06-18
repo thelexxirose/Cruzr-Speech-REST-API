@@ -13,6 +13,8 @@
   "author": "Cory Alexander Balaton",
   "license": "ISC",
   "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.0.20",
+    "@ffprobe-installer/ffprobe": "^1.0.12",
     "@google-cloud/speech": "^3.6.0",
     "@google-cloud/text-to-speech": "^2.3.0",
     "body-parser": "^1.19.0",
@@ -20,6 +22,8 @@
     "dialogflow": "^1.2.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "fluent-ffmpeg": "^2.1.2",
+    "linear16": "^1.2.0",
     "mp3-to-wav": "^0.1.11",
     "multer": "^1.4.2",
     "nodemon": "^2.0.2",

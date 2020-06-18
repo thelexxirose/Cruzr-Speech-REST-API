@@ -1,4 +1,6 @@
 //Initialize packages
+const linear16 = require('linear16');  
+const path = require('path');  
 const https = require('https');
 const fs = require('fs');
 const express = require('express');
@@ -7,11 +9,13 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
 const multer = require('multer');
+const mime = require('mime');
 
 //Make the three classes available for usage
 const NLP = require('./NLP');
 const STT = require('./STT');
 const TTS = require('./TTS');
+
 
 //Make ProjectVariables available for usage
 const PV = require('./ProjectVariables')
@@ -27,7 +31,8 @@ class Server {
         this.initRoutes();
         this.startHttp();
     }
-
+    
+    
     //Method to start https server. 
     startHttps() {
         https.createServer({
@@ -48,7 +53,7 @@ class Server {
 
     //Configure express
     config() {
-        app.use(bodyParser.urlencoded({ extended: false }));
+        app.use(bodyParser.urlencoded({ extended: true }));
         app.use(bodyParser.json());
         app.use(cors());
         app.use('/audio', express.static('./outputAudio'));
@@ -58,6 +63,8 @@ class Server {
             },
             filename: (req, file, cb) => {
                 console.log(file);
+
+
                 cb(null, file.originalname)
             }
         });
@@ -69,9 +76,10 @@ class Server {
     //Define routes
     initRoutes() {
         //Get route used to see if REST is working
-        app.get('/', (req, res) => {
-            res.send('REST is working');
-        });
+        app.get('/',function(req,res){
+            res.sendFile(__dirname + '/index.html');
+          
+          });
         
         //Send a piece of text to dialogflow and returns an answer
         app.post('/dialogflowMessage', (req, res) => {
@@ -135,13 +143,13 @@ class Server {
             res.send("POST is working!")
         });
 
-        //Send in a file, then convert file to text, send through dialogflow, then return an answer while creating an answer sound file that is stored on the server
+        //Send in a file, then convert file to text, send through dialogflow, then return an answer while creating an answer audio file that is stored on the server
         app.post('/upload_file',this.uploadDisk.any(), (req, res) => {
             console.log('file disk uploaded');
-            console.log('filename: ' + req.files[0].originalname);
+            console.log('filename: ' + req.files[0].filename);
             //res.send('file disk upload success');
             //Get the original name of the file that was sent
-            let query = req.files[0].originalname;
+            let query = req.files[0].filename;
             //Convert audio file to text
             this.stt.stt(query, 'LINEAR16')
             .then((text) => {
@@ -150,32 +158,9 @@ class Server {
                     let result = {
                         fulfillmentText: msg.fulfillmentText,
                         fields: msg.parameters.fields,
-                        intent: mfame
-                    }
-                    this.tts.tts(result.fulfillmentText);
-                    console.log(result);
-                    res.send(result);
-                });
-            });
-            //res.send('hello');
-        });
-
-
-        app.post('/upload_file_v2',this.uploadDisk.any(), (req, res) => {
-            console.log('file disk uploaded');
-            console.log('filename: ' + req.files[0].originalname);
-            //res.send('file disk upload success');
-            let query = req.files[0].originalname;
-            this.stt.stt(query, 'LINEAR16')
-            .then((text) => {
-                this.nlp.dflowProcessing(text)
-                .then((msg) => {
-                    let result = {
-                        fulfillmentText: msg.fulfillmentText,
-                        fields: msg.parameters.fields,
+                        //intent: mfame
                         intent: msg.intent.displayName
                     }
-                    //Create answer audio file
                     this.tts.tts(result.fulfillmentText);
                     console.log(result);
                     res.send(result);
@@ -184,14 +169,58 @@ class Server {
             //res.send('hello');
         });
 
+         //Send in a file, then convert file to text, send through dialogflow, then return an answer while creating an answer audio file that is stored on the server
+         app.post('/upload_file_v3',this.uploadDisk.any(), (req, res) => {
+            console.log('file disk uploaded');
+            console.log('filename: ' + req.files[0].filename);
+            let filePathIn = "./audio/"+req.files[0].filename
+            let filePathOut = "./audio/Converted_audio.wav";
 
+            Promise.resolve()
+                .then(() => {
+                    return linear16(filePathIn, filePathOut);
+                })
+                .then(() => {
+                    this.stt.stt(filePathOut)
+                    .then(text => {
+                        console.log('Text: ', text);
+                        if (text == ""){
+                            text = "hvordan går det?"
+                        }
+                        this.nlp.resolveQuery(text, (msg) => {
+                            let result = {
+                                fulfillmentText: msg.fulfillmentText,
+                                fields: msg.parameters.fields,
+                                //intent: mfame
+                                intent: msg.intent.displayName
+                            }
+                            this.tts.tts(result.fulfillmentText, () => {
+                                console.log(result);
+                                console.log("Result: " + result.fulfillmentText);
+
+                                //res.send(result.fulfillmentText);
+                                res.setHeader('Content-Disposition', "inline;filename=" + result.fulfillmentText);
+                                //res.attachment(__dirname + "/outputAudio/" + "output.mp3")
+                                //res.download(__dirname + "/outputAudio/" + "output.mp3", "output.mp3")
+                                res.sendFile(__dirname + "/outputAudio/" + "output.mp3");
+                                //res.send(result.fulfillmentText);
+                            });
+                            
+                        })
+                    });
+                })        
+        });
     }
 
     //Create new instances of the language classes
     initClasses() {
         //Project Variables
-        this.pv = new PV('hilda-lpjuyr', '../hilda-dialogflow-credentials.json', 'delta-exchange-279407', 'hilda-gcloud-credentials.json')
-        let language = 'en-US';
+        //this.pv = new PV('hilda-lpjuyr', '../hilda-dialogflow-credentials.json', 'delta-exchange-279407', '../hilda-gcloud-credentials.json')
+        this.pv = new PV('norsk-hilda-hbqgtg', '../norsk-hilda.json', 'delta-exchange-279407', '../hilda-gcloud-credentials.json')
+
+        //let language = 'en-US';
+        let language = 'no';
+
         //Speech To Text
         this.stt = new STT(language, this.pv.getGCloudProjectName(), this.pv.getGCloudCreds());
         //Text To Speech
@@ -203,9 +232,3 @@ class Server {
 
 //Run Server class
 new Server;
-
-//comment
-
-//develop
-
-

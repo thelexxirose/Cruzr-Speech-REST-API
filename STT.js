@@ -1,4 +1,13 @@
 //Speech To Text module
+const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
+const ffmpeg = require('fluent-ffmpeg');
+const { time } = require('console');
+
+ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+// console.log(ffmpegInstaller.path, ffmpegInstaller.version);
+
+//module.exports = ffmpeg;
+
 module.exports = class STT {
     constructor(language, projectName, credentials) {
       
@@ -23,10 +32,12 @@ module.exports = class STT {
        new this.Mp32Wav('C:/Users/thele/Documents/NodeJS/Cruzr-client/audio' + file);
     }
 
+    
+
     //stt method. returns a transcription of a wav sound file
     async stt(audioFile, encoding) {
       // The name of the audio file to transcribe
-      const fileName = './audio/' + audioFile;
+      const fileName = audioFile;
     
       // Reads a local audio file and converts it to base64
       const file = this.fs.readFileSync(fileName);
