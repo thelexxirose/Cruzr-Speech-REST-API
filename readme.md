@@ -9,23 +9,19 @@ npm install
 ```
 This installs node_modules and all necessary dependencies.
 
-Now you have to get an authentiacation key from dialogflow so that you can access dialogflow.
-When you have retrived a client access token, you have to point to the client access token as an environment variable. Note that you have to use **GOOGLE_APPLICATION_CREDENTIALS** as the variable name.
-On Windows powershell:
+To be able to use the API, you will need an api key from google cloud and from dialogflow. When you have generated the API keys, change the code referenced under so that the method is referencing project names and API keys.
+
+https://github.com/thelexxirose/Cruzr-Speech-REST-API/blob/f152720cbc0544393df89b64cce24e7a69839b83/index.js#L193
+
+You can now open up a terminal, go to your project directory and type this command:
+
 ```
-$env:GOOGLE_APPLICATION_CREDENTIALS="<Path to client access token>"
-```
-On linux:
-```
-export GOOGLE_APPLICATION_CREDENTIALS=<Path to client access token>
+npm run start-dev
 ```
 
-Now that you've set the client access token as an environmental variable, you can start the application by running this command:
-```
-npm test
-```
+This will start a server using nodemon using port 3000. The great thing about nodemon is that it comes with hot reloading, so you don't have to restart the server manually everytime you make a change.
 
-Now go to a browser and type in this address to check if it works:
+Now go to a browser and type in this address to check if the server works:
 ```
 http://localhost:3000
 ```
