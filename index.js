@@ -30,6 +30,12 @@ class Server {
         this.initClasses();
         this.initRoutes();
         this.startHttp();
+        this.jsonObject = {
+            fulfillmentText:"",
+            fields:"",
+            intent:""
+
+        }
     }
     
     
@@ -71,6 +77,8 @@ class Server {
         this.uploadDisk = multer({
             storage: this.storage
         });
+
+        
     }
 
     //Define routes
@@ -166,11 +174,10 @@ class Server {
                     res.send(result);
                 });
             });
-            //res.send('hello');
         });
 
          //Send in a file, then convert file to text, send through dialogflow, then return an answer while creating an answer audio file that is stored on the server
-         app.post('/upload_file_v3',this.uploadDisk.any(), (req, res) => {
+        app.post('/upload_file_v3',this.uploadDisk.any(), (req, res) => {
             console.log('file disk uploaded');
             console.log('filename: ' + req.files[0].filename);
             let filePathIn = "./audio/"+req.files[0].filename
@@ -185,30 +192,49 @@ class Server {
                     .then(text => {
                         console.log('Text: ', text);
                         if (text == ""){
-                            text = "hvordan går det?"
+                            text = "Hi"
                         }
                         this.nlp.resolveQuery(text, (msg) => {
                             let result = {
                                 fulfillmentText: msg.fulfillmentText,
                                 fields: msg.parameters.fields,
-                                //intent: mfame
                                 intent: msg.intent.displayName
                             }
                             this.tts.tts(result.fulfillmentText, () => {
                                 console.log(result);
                                 console.log("Result: " + result.fulfillmentText);
+                                /*
+                                this.tts.writeFile('./outputAudio/intent.txt', result.intent)
+                                this.tts.appendFile('./outputAudio/intent.txt', "-"+result.fulfillmentText)
+                                this.tts.appendFile('./outputAudio/intent.txt', "-"+result.fields)
+                                */
+                                this.jsonObject["fulfillmentText"]=result.fulfillmentText;
+                                this.jsonObject["fields"]=result.fields;
+                                this.jsonObject["intent"]=result.intent;
 
-                                //res.send(result.fulfillmentText);
-                                res.setHeader('Content-Disposition', "inline;filename=" + result.fulfillmentText);
-                                //res.attachment(__dirname + "/outputAudio/" + "output.mp3")
-                                //res.download(__dirname + "/outputAudio/" + "output.mp3", "output.mp3")
+
+                              
                                 res.sendFile(__dirname + "/outputAudio/" + "output.mp3");
-                                //res.send(result.fulfillmentText);
                             });
-                            
                         })
                     });
                 })        
+        });
+
+        /*app.get('/get_intent',function(req,res){
+            fs.readFile(__dirname + '/outputAudio/intent.txt', 'utf8', function (err,data) {
+                if (err) {
+                  return console.log(err);
+                }
+                console.log(data);
+                res.send(data)
+              });
+
+          
+          });*/
+        app.get('/get_intent', (req,res) => {
+        res.send(this.jsonObject)
+                   
         });
     }
 

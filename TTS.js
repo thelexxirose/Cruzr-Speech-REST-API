@@ -1,3 +1,7 @@
+const { writeFile } = require('fs');
+const fs = require('fs');
+
+
 //Text To Speech module
 module.exports = class TTS {
     constructor(language, projectName, credentials) {
@@ -40,4 +44,28 @@ module.exports = class TTS {
 
         callback();
     }
+    writeFile(fileName, inputText) {
+        fs.writeFile(fileName, inputText, function (err) {
+            if (err) throw err;
+            console.log('File is created successfully.');
+          }); 
+    } 
+    appendFile(fileName, inputText) {
+        
+          fs.appendFile(fileName, inputText, function (err) {
+            if (err) throw err;
+            console.log('Added fullfillmentText.');
+          });  
+    } 
+
+    
 }
+
+
+    
+    
+    
+    
+    
+
+
