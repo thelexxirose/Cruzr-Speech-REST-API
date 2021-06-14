@@ -10,11 +10,14 @@ const app = express();
 const port = process.env.PORT || 3000;
 const multer = require('multer');
 const mime = require('mime');
+require('dotenv').config()
 
 //Make the three classes available for usage
 const NLP = require('./NLP');
 const STT = require('./STT');
 const TTS = require('./TTS');
+const GPT3 = require('./GPT3');
+
 
 
 //Make ProjectVariables available for usage
@@ -92,7 +95,7 @@ class Server {
         //Send a piece of text to dialogflow and returns an answer
         app.post('/dialogflowMessage', (req, res) => {
             //Retrieve query text
-            let query = req.body.text;
+            let query = req.body.terrxt;
             console.log('dialogflowMessage query: ' + query);
             //Send query to dialogflow
             this.nlp.resolveQuery(query, (msg) => {
@@ -200,6 +203,7 @@ class Server {
                                 fields: msg.parameters.fields,
                                 intent: msg.intent.displayName
                             }
+                            console.log('NLP: ', result.fulfillmentText);
                             this.tts.tts(result.fulfillmentText, () => {
                                 console.log(result);
                                 console.log("Result: " + result.fulfillmentText);
@@ -211,6 +215,50 @@ class Server {
                                 this.jsonObject["fulfillmentText"]=result.fulfillmentText;
                                 this.jsonObject["fields"]=result.fields;
                                 this.jsonObject["intent"]=result.intent;
+
+
+                              
+                                res.sendFile(__dirname + "/outputAudio/" + "output.mp3");
+                            });
+                        })
+                    });
+                })        
+        });
+         //Send in a file, then convert file to text, send through GPT3, then return an answer while creating an answer audio file that is stored on the server
+         //NOT WORKING
+         app.post('/upload_file_gpt3',this.uploadDisk.any(), (req, res) => {
+            console.log('file disk uploaded');
+            console.log('filename: ' + req.files[0].filename);
+            let filePathIn = "./audio/"+req.files[0].filename
+            let filePathOut = "./audio/Converted_audio.wav";
+
+            Promise.resolve()
+                .then(() => {
+                    return linear16(filePathIn, filePathOut);
+                })
+                .then(() => {
+                    this.stt.stt(filePathOut)
+                    .then(text => {
+                        console.log('Text: ', text);
+                        if (text == ""){
+                            text = "Hi"
+                        }
+                        this.gpt.GPT(text, (msg) => {
+                            let result = {
+                                msg
+                            }
+                            console.log('GPT: ', result);
+                            this.tts.tts(result, () => {
+                                console.log(result);
+                                console.log("Result: " + result);
+                                /*
+                                this.tts.writeFile('./outputAudio/intent.txt', result.intent)
+                                this.tts.appendFile('./outputAudio/intent.txt', "-"+result.fulfillmentText)
+                                this.tts.appendFile('./outputAudio/intent.txt', "-"+result.fields)
+                                */
+                                this.jsonObject["fulfillmentText"]=result;
+                                //this.jsonObject["fields"]=result.fields;
+                                //this.jsonObject["intent"]=result.intent;
 
 
                               
@@ -253,6 +301,8 @@ class Server {
         this.tts = new TTS(language, this.pv.getGCloudProjectName(), this.pv.getGCloudCreds());
         //Natural Language Processing
         this.nlp = new NLP(language, this.pv.getDflowProjectName(), this.pv.getDflowCreds());
+        //GPT3
+        this.gpt = new GPT3();
     }
 }
 
