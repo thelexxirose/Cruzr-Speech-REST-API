@@ -16,7 +16,7 @@ require('dotenv').config()
 const NLP = require('./NLP');
 const STT = require('./STT');
 const TTS = require('./TTS');
-const GPT3 = require('./GPT3');
+const GPT3 = require('./GPT3_2');
 
 
 
@@ -224,6 +224,7 @@ class Server {
                     });
                 })        
         });
+        
          //Send in a file, then convert file to text, send through GPT3, then return an answer while creating an answer audio file that is stored on the server
          //NOT WORKING
          app.post('/upload_file_gpt3',this.uploadDisk.any(), (req, res) => {
@@ -241,30 +242,34 @@ class Server {
                     .then(text => {
                         console.log('Text: ', text);
                         if (text == ""){
-                            text = "Hi"
-                        }
-                        this.gpt.GPT(text, (msg) => {
-                            let result = {
-                                msg
-                            }
-                            console.log('GPT: ', result);
-                            this.tts.tts(result, () => {
-                                console.log(result);
-                                console.log("Result: " + result);
-                                /*
-                                this.tts.writeFile('./outputAudio/intent.txt', result.intent)
-                                this.tts.appendFile('./outputAudio/intent.txt', "-"+result.fulfillmentText)
-                                this.tts.appendFile('./outputAudio/intent.txt', "-"+result.fields)
-                                */
-                                this.jsonObject["fulfillmentText"]=result;
-                                //this.jsonObject["fields"]=result.fields;
-                                //this.jsonObject["intent"]=result.intent;
+                            text = "Hi"}
 
+                        this.gpt.gpt3_message(text)
+                            .then(result =>{
+                                //console.log('Result2: ', result);
 
-                              
-                                res.sendFile(__dirname + "/outputAudio/" + "output.mp3");
+                                this.tts.tts(result, () => {
+                                    //console.log("Result: " + result);
+                                    /*
+                                    this.tts.writeFile('./outputAudio/intent.txt', result.intent)
+                                    this.tts.appendFile('./outputAudio/intent.txt', "-"+result.fulfillmentText)
+                                    this.tts.appendFile('./outputAudio/intent.txt', "-"+result.fields)
+                                    */
+                                    this.jsonObject["fulfillmentText"]=result;
+                                    //this.jsonObject["fields"]=result.fields;
+                                    //this.jsonObject["intent"]=result.intent;
+    
+    
+                                  
+                                    res.sendFile(__dirname + "/outputAudio/" + "output.mp3");
+                                
+                            
+                            })
+
+                            //console.log('GPT: ', result);
+                            
                             });
-                        })
+                        
                     });
                 })        
         });
@@ -290,7 +295,7 @@ class Server {
     initClasses() {
         //Project Variables
         //this.pv = new PV('hilda-lpjuyr', '../hilda-dialogflow-credentials.json', 'delta-exchange-279407', '../hilda-gcloud-credentials.json')
-        this.pv = new PV('norsk-hilda-hbqgtg', '../norsk-hilda.json', 'delta-exchange-279407', '../hilda-gcloud-credentials.json')
+        this.pv = new PV('norsk-hilda-hbqgtg', '../norsk-hilda.json', 'delta-exchange-279407', '../hilda-gcloud-credentials.json', '../gpt3_creds.json')
 
         //let language = 'en-US';
         let language = 'no';
@@ -302,7 +307,9 @@ class Server {
         //Natural Language Processing
         this.nlp = new NLP(language, this.pv.getDflowProjectName(), this.pv.getDflowCreds());
         //GPT3
-        this.gpt = new GPT3();
+        //console.log('landuage: ' + language);
+
+        this.gpt = new GPT3(language);
     }
 }
 

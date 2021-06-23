@@ -20,7 +20,9 @@ module.exports = class NLP {
         const sessionClient = new this.dialogflow.SessionsClient({
             projectId: this.projectName,
             keyFilename: this.credentials
+            
         });
+        console.log('NLP creds: ' + this.credentials);
 
         //
         const sessionPath = sessionClient.sessionPath(this.projectName, sessionId);
